@@ -1,0 +1,52 @@
+---
+title: "Package Management in R"
+subtitle: ""
+author: 
+  - "Isabella Velásquez, Gates Foundation"
+  - "Mike Garcia, ProCogia"
+date: "May 7th, 2020"
+output:
+  xaringan::moon_reader:
+    lib_dir: libs
+    nature:
+      highlightStyle: github
+      highlightLines: true
+      countIncrementalSlides: false
+---
+
+---
+class: inverse, center, middle
+
+#Welcome/Intro/Overview/Background
+
+---
+
+---
+class: inverse, center, middle
+
+# Upgrading versions of R
+
+---
+# Isabella's content
+
+
+---
+
+---
+class: inverse, center, middle
+
+# Package management in projects
+
+```{r, echo=FALSE, out.height=300}
+knitr::include_graphics('img/renv-hex.svg')
+```
+
+---
+# Mike's content
+
+
+
+---
+class: inverse, center, middle
+
+# Conclusion/Questions?
