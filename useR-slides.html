@@ -7,6 +7,7 @@
     <meta name="author" content="Mike Garcia, ProCogia" />
     <link href="libs/remark-css-0.0.1/default.css" rel="stylesheet" />
     <link href="libs/remark-css-0.0.1/default-fonts.css" rel="stylesheet" />
+    <script src="libs/kePrint-0.0.1/kePrint.js"></script>
   </head>
   <body>
     <textarea id="source">
@@ -82,8 +83,12 @@ You can "start fresh" with no packages installed when you upgrade R.
 * Another option is to use {pacman}, that installs packages that are not already installed but mentioned in code.
 * For previously written scripts, RStudio provides a helpful message if it detects a package that is not installed.
 
+<<<<<<< HEAD
 &lt;img src="img/brms.png" width="1256" /&gt;
 
+=======
+![](img/brms.png)&lt;!-- --&gt;
+>>>>>>> upstream/master
 ---
 # Upgrade R // Reinstall All Packages
 
@@ -125,6 +130,11 @@ Source: https://twitter.com/andrewheiss/status/1021944992351186944?s=21
 ---
 # Do Not Upgrade R
 
+<<<<<<< HEAD
+=======
+![](img/stringasfactors.jpg)&lt;!-- --&gt;
+
+>>>>>>> upstream/master
 Even if you’d rather wait for R v4.1.0, there are a few things you can do:
 
 * Test it out before you upgrade
@@ -181,14 +191,440 @@ class: inverse, center, middle
 &lt;img src="img/renv-hex.svg" height="300" /&gt;
 
 ---
-# Mike's content
 
+# Poll
+
+What is your opinion/familiarity with Python?
+
+* 🐍 What's Python? I don't like snakes!!
+* 👼 I love R and use Python sparingly if at all
+* 👿 I love Python and use R sparingly if at all
+* 🤷 I'm an equal opportunity programmer and will use any tool to get the job done
+
+---
+# A brief history of my programming past:
+
+&lt;img src="img/mike-timeline.png" height="200" style="display: block; margin: auto;" /&gt;
+
+&gt; A language that doesn't affect the way you think about programming, is not worth knowing.
+&gt; - Alan Perlis
+
+---
+# Some things I've learned from Python:
+
+&lt;img src="https://upload.wikimedia.org/wikipedia/commons/thumb/c/c3/Python-logo-notext.svg/1200px-Python-logo-notext.svg.png" width="50" style="display: block; margin: auto auto auto 0;" /&gt;
+
+.pull-left[ 
+
+Virtual environments are a big thing and use of package management tools is widespread in Python community:
+    
+  - `pipenv`
+  - `virtualenv`
+  - `venv`
+  - `pyvenv`
+  
+  ]
+.pull-right[
+  This is a good thing for reproducibility!
+]
+
+---
+# Reproducible data science with R 
+
+.pull-left[
+
+  ###  Literate programming:
+
+  - Sweave 
+  - knitr
+  - Markdown
+]
+
+.pull-right[
+
+  ### Package management:
+
+  Less of a focus in the community until recently.
+  
+  - Packrat
+]
+
+---
+## Introducing: `renv`
+
+- Oct 2019: `renv 0.8.0` released on CRAN 
+- Feb 2020: latest release (`renv 0.9.3`)
+
+Goal is for `renv` to be a stable replacement to `Packrat`
+
+### Philosophy of `renv` 
+
+&gt; Any of your existing workflows should just work as they did before
+
+---
+# Workflow overview:
+
+
+- `renv::init()`: Initialize a new project-local environment with a private R library
+- Business as usual, installing and removing new R packages as needed
+- `renv::snapshot()`: Save the state of the project library to the lockfile
+- More business as usual
+- `renv::snapshot()`: Save project library again
+- `renv::restore()`: Revert to the previous state as encoded in the lockfile if your attempts to update packages introduced some new problems.
+
+---
+# schrute package
+
+--
+
+The entire transcript from The Office
+--
+...
+--
+in Tidy Format!
+
+
+&lt;img src="https://media3.giphy.com/media/lMVNl6XxTvXgs/200w.webp?cid=ecf05e47ff356c33f2489eefdcfff62be8ab2bca7b24bab2&amp;rid=200w.webp" height="300" style="display: block; margin: auto;" /&gt;
+
+---
+
+Available on CRAN:
+
+```r
+# install.packages("schrute")
+library(schrute)
+
+data(theoffice)
+head(theoffice)
+```
+
+&lt;table class="table table-striped table-hover table-condensed table-responsive" style="font-size: 7px; margin-left: auto; margin-right: auto;"&gt;
+ &lt;thead&gt;
+  &lt;tr&gt;
+   &lt;th style="text-align:right;"&gt; index &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; season &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; episode &lt;/th&gt;
+   &lt;th style="text-align:left;"&gt; episode_name &lt;/th&gt;
+   &lt;th style="text-align:left;"&gt; director &lt;/th&gt;
+   &lt;th style="text-align:left;"&gt; writer &lt;/th&gt;
+   &lt;th style="text-align:left;"&gt; character &lt;/th&gt;
+   &lt;th style="text-align:left;"&gt; text &lt;/th&gt;
+   &lt;th style="text-align:left;"&gt; text_w_direction &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; imdb_rating &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; total_votes &lt;/th&gt;
+   &lt;th style="text-align:left;"&gt; air_date &lt;/th&gt;
+  &lt;/tr&gt;
+ &lt;/thead&gt;
+&lt;tbody&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:right;"&gt; 1 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 1 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 1 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; Pilot &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; Ken Kwapis &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; Ricky Gervais;Stephen Merchant;Greg Daniels &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; Michael &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; All right Jim. Your quarterlies look very good. How are things at the library? &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; All right Jim. Your quarterlies look very good. How are things at the library? &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 7.6 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 3706 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 2005-03-24 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:right;"&gt; 2 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 1 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 1 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; Pilot &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; Ken Kwapis &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; Ricky Gervais;Stephen Merchant;Greg Daniels &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; Jim &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; Oh, I told you. I couldn't close it. So... &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; Oh, I told you. I couldn't close it. So... &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 7.6 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 3706 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 2005-03-24 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:right;"&gt; 3 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 1 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 1 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; Pilot &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; Ken Kwapis &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; Ricky Gervais;Stephen Merchant;Greg Daniels &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; Michael &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; So you've come to the master for guidance? Is this what you're saying, grasshopper? &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; So you've come to the master for guidance? Is this what you're saying, grasshopper? &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 7.6 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 3706 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 2005-03-24 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:right;"&gt; 4 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 1 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 1 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; Pilot &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; Ken Kwapis &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; Ricky Gervais;Stephen Merchant;Greg Daniels &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; Jim &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; Actually, you called me in here, but yeah. &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; Actually, you called me in here, but yeah. &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 7.6 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 3706 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 2005-03-24 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:right;"&gt; 5 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 1 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 1 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; Pilot &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; Ken Kwapis &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; Ricky Gervais;Stephen Merchant;Greg Daniels &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; Michael &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; All right. Well, let me show you how it's done. &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; All right. Well, let me show you how it's done. &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 7.6 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 3706 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 2005-03-24 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:right;"&gt; 6 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 1 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 1 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; Pilot &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; Ken Kwapis &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; Ricky Gervais;Stephen Merchant;Greg Daniels &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; Michael &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; Yes, I'd like to speak to your office manager, please. Yes, hello. This is Michael Scott. I am the Regional Manager of Dunder Mifflin Paper Products. Just wanted to talk to you manager-a-manger. All right. Done deal. Thank you very much, sir. You're a gentleman and a scholar. Oh, I'm sorry. OK. I'm sorry. My mistake. That was a woman I was talking to, so... She had a very low voice. Probably a smoker, so... So that's the way it's done. &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; [on the phone] Yes, I'd like to speak to your office manager, please. Yes, hello. This is Michael Scott. I am the Regional Manager of Dunder Mifflin Paper Products. Just wanted to talk to you manager-a-manger. [quick cut scene] All right. Done deal. Thank you very much, sir. You're a gentleman and a scholar. Oh, I'm sorry. OK. I'm sorry. My mistake. [hangs up] That was a woman I was talking to, so... She had a very low voice. Probably a smoker, so... [Clears throat] So that's the way it's done. &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 7.6 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 3706 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 2005-03-24 &lt;/td&gt;
+  &lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+
+---
+
+Being good package managers and reproducible data scientists, let's
+
+1. Start an R project
+2. Start a reproducible report in R Markdown &lt;sup&gt;1&lt;/sup&gt;
+3. Set up `renv`:
+
+
+```r
+renv::init()
+```
+
+This will initialize a `lockfile` with all packages and dependencies detected in the project. 
+
+.footnote[
+[1] For our purposes, the R Markdown part will be make-believe. I'll just show the results in the slides
+]
+
+---
+Let's look at average IMDB ratings over the seasons:
+
+
+```r
+theoffice %&gt;% 
+  select(season, imdb_rating) %&gt;% 
+  distinct() %&gt;% 
+  group_by(season) %&gt;% 
+  summarize(avg_imdb = mean(imdb_rating))
+```
+
+```
+## # A tibble: 9 x 2
+##   season avg_imdb
+##    &lt;int&gt;    &lt;dbl&gt;
+## 1      1     8.02
+## 2      2     8.53
+## 3      3     8.64
+## 4      4     8.5 
+## 5      5     8.65
+## 6      6     8.18
+## 7      7     8.49
+## 8      8     7.55
+## 9      9     8.05
+```
+
+---
+## Make a quick ggplot...
+
+.pull-left[
+![](useR-slides_files/figure-html/unnamed-chunk-12-1.png)&lt;!-- --&gt;
+]
+
+.pull-right[
+Sounds about right to Office fans:
+
+- First few seasons were great
+- Slump in middle
+- Things got weird at the end
+- Slight recovery with final season
+
+]
+
+---
+# Share with the world!
+
+- You share code on GitHub
+- Eager to build on your groundbreaking results, collaborators fork your repo
+
+---
+
+# How about some flair?
+
+&lt;img src="https://i.imgflip.com/1hzigk.jpg" height="100" style="display: block; margin: auto;" /&gt;
+
+--
+
+After all your hard work on your report that you've now shared with the world, you find out about the brand new `flair` package &lt;sup&gt;1&lt;/sup&gt;. 
+
+This is a perfect way to highlight those tricky code bits to help your co-workers learn R.
+
+.footnote[
+[1] Just released on May 4th!
+]
+
+---
+
+# Install from CRAN
+
+
+```r
+install.packages("flair")
+```
+
+--
+
+Now our lockfile is out of date! 
+
+
+--
+
+That's a simple fix: `renv::snapshot()` will update the lockfile. 
+
+--
+
+Next, revise your code with the appropriate number of flair:
+
+
+```r
+decorate('theoffice %&gt;%
+  select(season, imdb_rating) %&gt;%
+  distinct() %&gt;%
+  group_by(season) %&gt;%
+  summarize(avg_imdb = mean(imdb_rating))') %&gt;%
+  flair('%&gt;%') %&gt;%
+  flair('theoffice', background='Coral') %&gt;%
+  flair('mean', background='Aquamarine')
+```
+---
+&lt;img src="img/flair.png" height="300" style="display: block; margin: auto;" /&gt;
+
+---
+
+---
+
+# Deeper dive
+
+`renv::init()` creates:
+
+- lockfile named `renv.lock`
+- project-local environment with private library (`renv/library`)
+  - separate from system libary
+  - created by crawling for dependencies with `renv::dependencies()`
+  - Packages copied from user library if already installed
+    - Instead of re-installing from CRAN
+
+&lt;img src="img/project-library.png" height="200" style="display: block; margin: auto;" /&gt;
+
+---
+
+# Deeper dive
+
+- `renv::snapshot()`: saves state of project to lockfile (`renv.lock`)
+
+--
+
+- `renv::restore()`: reverts to previous state of lockfile if package installation attempts are unsuccessful
 
 
 ---
+
+# Package sources
+
+Compatible with 
+
+- CRAN
+- GitHub
+- BioConductor
+- GitLab
+- Bitbucket
+- Custom/local packages
+
+The `DESCRIPTION` file of a package is used to infer the source
+
+---
+# Comparison with Packrat&lt;sup&gt;1&lt;/sup&gt;:
+
+1. `renv.lock` is a JSON file, ease of use with other tools
+2. `renv` doesn't attempt to track package tarballs
+3. `renv` doesn't track "stale" packages, installed but not recorded in lockfile
+4. `renv` uses a global cache across all projects maintained with `renv`, reducing disk space
+5. More configurable dependency discovery
+
+.footnote[
+[1] Abbreviated from `renv` documentation website
+]
+
+---
+
+# Collaboration
+
+As in the `schrute`/`flair` example, collaboration is easiest with a centrol version control repository (like GitHub)
+
+-- 
+Collaborators can run `renv::init()` from `renv.lock` included in repository. 
+
+-- 
+
+Collaborators can update lockfile with any packages they install via `renv::snapshot()` and then push updated lockfile to central repo. 
+
+
+---
+# Use with Python
+
+If your project uses both R and Python ,(hen `renv` can manage both!
+
+---
+
+Compatible with
+
+- `reticulate`
+- Virtual environments
+- Conda environments
+
+---
+
+# Conclusion
+
+- Learning a new language can motivate you to improve skills in a language you already know
+
+--
+
+- R has an exciting new option for improving reproducibility even more
+
+--
+
+- `renv` has lots of options and flexibility but retains simplicity 
+
+--
 class: inverse, center, middle
 
-# Conclusion/Questions?
+# Cuestions?
 
 ---
 # References
@@ -198,6 +634,10 @@ class: inverse, center, middle
 * [Four New Useful Features in R 4.0.0](https://www.r-bloggers.com/4-for-4-0-0-four-useful-new-features-in-r-4-0-0/)
 * [R 4.0.0 Now Available](https://www.r-bloggers.com/r-4-0-0-now-available-and-a-look-back-at-rs-history/
 )
+*
+## More on `renv`
+
+ [renv website](rstudio.github.io.renv)
     </textarea>
 <style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
 <script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>
