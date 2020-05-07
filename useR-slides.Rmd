@@ -634,7 +634,7 @@ The `DESCRIPTION` file of a package is used to infer the source
 
 # Collaboration
 
-As in the `schrute`/`flair` example, collaboration is easiest with a centrol version control repository (like GitHub)
+As in the `schrute`/`flair` example, collaboration is easiest with a central version control repository (like GitHub)
 
 --
 
