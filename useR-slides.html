@@ -23,12 +23,6 @@ class: center, middle, inverse, title-slide
 
 
 
----
-class: inverse, center, middle
-
-#Welcome/Intro/Overview/Background
-
----
 class: inverse, center, middle
 
 # Hello!
@@ -237,7 +231,7 @@ Even if you’d rather wait for R v4.1.0, there are a few things you can do:
 
 * How do you code?
 * How feasily can you refind your non-CRAN packages?
-* How fragile in your code?
+* How fragile is your code?
 * Do you want a 'fresh start'?
 * Will your packages work with R 4.0.0?
 * What do your dependencies look like?
@@ -264,6 +258,17 @@ Even if you’d rather wait for R v4.1.0, there are a few things you can do:
 ---
 class: inverse, center, middle
 
+# Hello!
+
+Mike Garcia
+
+Twitter: @cascadianzeno
+
+Email: mike@procogia.com
+
+---
+class: inverse, center, middle
+
 # Package management in projects
 
 &lt;img src="img/renv-hex.svg" height="300" /&gt;
@@ -276,7 +281,7 @@ What is your opinion/familiarity with Python?
 
 * 🐍 What's Python? I don't like snakes!!
 * 👼 I love R and use Python sparingly if at all
-* 😈 I love Python and use R sparingly if at all
+* 👿 I love Python and use R sparingly if at all
 * 🤷 I'm an equal opportunity programmer and will use any tool to get the job done
 
 ---
@@ -284,8 +289,11 @@ What is your opinion/familiarity with Python?
 
 &lt;img src="img/mike-timeline.png" height="200" style="display: block; margin: auto;" /&gt;
 
+--
+
 &gt; A language that doesn't affect the way you think about programming, is not worth knowing.
-&gt; - Alan Perlis
+&gt; 
+&gt; &lt;footer&gt;--- Alan Perlis&lt;/footer&gt;
 
 ---
 # Some things I've learned from Python:
@@ -302,17 +310,27 @@ Virtual environments are a big thing and use of package management tools is wide
   - `pyvenv`
   
   ]
+
 .pull-right[
-  This is a good thing for reproducibility!
+  This is a good thing!
+  
+  - Better reproducibility
+  - Isolate project dependencies
+  - Use different versions of same package for different projects
+  
 ]
 
 ---
 # Reproducible data science with R 
 
+&lt;img src="https://www.r-project.org/logo/Rlogo.png" width="50" style="display: block; margin: auto auto auto 0;" /&gt;
+
 .pull-left[
 
   ###  Literate programming:
 
+ Strong tradition in R community:
+ 
   - Sweave 
   - knitr
   - Markdown
@@ -328,12 +346,21 @@ Virtual environments are a big thing and use of package management tools is wide
 ]
 
 ---
+
+.pull-left[
 ## Introducing: `renv`
+]
+.pull-right[
+&lt;img src="img/renv-hex.svg" width="100" style="display: block; margin: auto 0 auto auto;" /&gt;
+]
+
 
 - Oct 2019: `renv 0.8.0` released on CRAN 
 - Feb 2020: latest release (`renv 0.9.3`)
 
 Goal is for `renv` to be a stable replacement to `Packrat`
+
+--
 
 ### Philosophy of `renv` 
 
@@ -344,10 +371,22 @@ Goal is for `renv` to be a stable replacement to `Packrat`
 
 
 - `renv::init()`: Initialize a new project-local environment with a private R library
+
+--
+
 - Business as usual, installing and removing new R packages as needed
+
+--
+
 - `renv::snapshot()`: Save the state of the project library to the lockfile
+
+--
+
 - More business as usual
 - `renv::snapshot()`: Save project library again
+
+--
+
 - `renv::restore()`: Revert to the previous state as encoded in the lockfile if your attempts to update packages introduced some new problems.
 
 ---
@@ -531,7 +570,7 @@ theoffice %&gt;%
 ## Make a quick ggplot...
 
 .pull-left[
-![](useR-slides_files/figure-html/unnamed-chunk-25-1.png)&lt;!-- --&gt;
+![](useR-slides_files/figure-html/unnamed-chunk-27-1.png)&lt;!-- --&gt;
 ]
 
 .pull-right[
@@ -554,7 +593,7 @@ Sounds about right to Office fans:
 
 # How about some flair?
 
-&lt;img src="https://i.imgflip.com/1hzigk.jpg" height="100" style="display: block; margin: auto;" /&gt;
+&lt;img src="https://i.imgflip.com/1hzigk.jpg" height="300" style="display: block; margin: auto;" /&gt;
 
 --
 
@@ -590,19 +629,17 @@ Next, revise your code with the appropriate number of flair:
 
 
 ```r
-decorate('theoffice %&gt;%
+decorate("theoffice %&gt;%
   select(season, imdb_rating) %&gt;%
   distinct() %&gt;%
   group_by(season) %&gt;%
-  summarize(avg_imdb = mean(imdb_rating))') %&gt;%
+  summarize(avg_imdb = mean(imdb_rating))") %&gt;%
   flair('%&gt;%') %&gt;%
   flair('theoffice', background='Coral') %&gt;%
   flair('mean', background='Aquamarine')
 ```
 ---
 &lt;img src="img/flair.png" height="300" style="display: block; margin: auto;" /&gt;
-
----
 
 ---
 
@@ -624,6 +661,10 @@ decorate('theoffice %&gt;%
 # Deeper dive
 
 - `renv::snapshot()`: saves state of project to lockfile (`renv.lock`)
+
+
+&lt;img src="img/lockfile.png" width="300" style="display: block; margin: auto auto auto 0;" /&gt;
+
 
 --
 
@@ -664,20 +705,49 @@ The `DESCRIPTION` file of a package is used to infer the source
 
 As in the `schrute`/`flair` example, collaboration is easiest with a centrol version control repository (like GitHub)
 
--- 
-Collaborators can run `renv::init()` from `renv.lock` included in repository. 
+--
 
--- 
+Collaborators can: 
 
-Collaborators can update lockfile with any packages they install via `renv::snapshot()` and then push updated lockfile to central repo. 
+1. Run `renv::init()` from `renv.lock` included in repository. 
+2. Update lockfile with any packages they install via `renv::snapshot()` 
+3. Push updated lockfile to central repo along with code
+
+---
+# Real world example
+
+--
+
+These slides!
+
+--
+
+We built these slides in `xaringan` using GitHub for collaboration. Due to differences in both packages and installed versions of R, the formatting was getting horribly mangled. 
+
+--
+
+So we practiced what we're preaching, made our versions of R consistent and used `renv` to manage the project. 
+
+--
+
+...and the slides rendered perfectly. 
+
+&lt;img src="https://media.giphy.com/media/zcCGBRQshGdt6/giphy.gif" width="300" style="display: block; margin: auto;" /&gt;
+
 
 
 ---
+
+.pull-left[
 # Use with Python
+]
+.pull-right[
+&lt;img src="https://rstudio.github.io/reticulate/images/reticulated_python.png" width="100" style="display: block; margin: auto 0 auto auto;" /&gt;
+]
 
-If your project uses both R and Python ,(hen `renv` can manage both!
+If your project uses both R and Python then `renv` can manage both!
 
----
+--
 
 Compatible with
 
@@ -699,6 +769,10 @@ Compatible with
 
 - `renv` has lots of options and flexibility but retains simplicity 
 
+--
+
+- Virtual environments offer another option to reinstalling packages during upgrades
+
 ---
 class: inverse, center, middle
 
@@ -706,12 +780,14 @@ class: inverse, center, middle
 
 ## Isabella Velásquez, @ivelasq3
 
+## Mike Garcia, @cascadianzeno
+
 ---
 # References
 
 ## More on `renv`
 
- [renv website](rstudio.github.io.renv)
+[renv website](rstudio.github.io.renv)
     </textarea>
 <style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
 <script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>

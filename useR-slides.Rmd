@@ -25,12 +25,6 @@ library(kableExtra)
 library(flair)
 ```
 
----
-class: inverse, center, middle
-
-#Welcome/Intro/Overview/Background
-
----
 class: inverse, center, middle
 
 # Hello!
@@ -252,7 +246,7 @@ knitr::include_graphics('https://media0.giphy.com/media/xUA7aUNw61j9Vdzs0U/giphy
 
 * How do you code?
 * How feasily can you refind your non-CRAN packages?
-* How fragile in your code?
+* How fragile is your code?
 * Do you want a 'fresh start'?
 * Will your packages work with R 4.0.0?
 * What do your dependencies look like?
@@ -281,6 +275,17 @@ knitr::include_graphics("img/error.png")
 ---
 class: inverse, center, middle
 
+# Hello!
+
+Mike Garcia
+
+Twitter: @cascadianzeno
+
+Email: mike@procogia.com
+
+---
+class: inverse, center, middle
+
 # Package management in projects
 
 ```{r, echo=FALSE, out.height=300}
@@ -305,8 +310,11 @@ What is your opinion/familiarity with Python?
 knitr::include_graphics("img/mike-timeline.png")
 ```
 
+--
+
 > A language that doesn't affect the way you think about programming, is not worth knowing.
-> - Alan Perlis
+> 
+> `r tufte::quote_footer('--- Alan Perlis')`
 
 ---
 # Some things I've learned from Python:
@@ -325,17 +333,29 @@ Virtual environments are a big thing and use of package management tools is wide
   - `pyvenv`
   
   ]
+
 .pull-right[
-  This is a good thing for reproducibility!
+  This is a good thing!
+  
+  - Better reproducibility
+  - Isolate project dependencies
+  - Use different versions of same package for different projects
+  
 ]
 
 ---
 # Reproducible data science with R 
 
+```{r echo=F, out.width=50, fig.align='left'}
+  knitr::include_graphics('https://www.r-project.org/logo/Rlogo.png')
+```
+
 .pull-left[
 
   ###  Literate programming:
 
+ Strong tradition in R community:
+ 
   - Sweave 
   - knitr
   - Markdown
@@ -351,12 +371,23 @@ Virtual environments are a big thing and use of package management tools is wide
 ]
 
 ---
+
+.pull-left[
 ## Introducing: `renv`
+]
+.pull-right[
+```{r echo=F, out.width=100, fig.align='right'}
+knitr::include_graphics('img/renv-hex.svg')
+```
+]
+
 
 - Oct 2019: `renv 0.8.0` released on CRAN 
 - Feb 2020: latest release (`renv 0.9.3`)
 
 Goal is for `renv` to be a stable replacement to `Packrat`
+
+--
 
 ### Philosophy of `renv` 
 
@@ -367,10 +398,22 @@ Goal is for `renv` to be a stable replacement to `Packrat`
 
 
 - `renv::init()`: Initialize a new project-local environment with a private R library
+
+--
+
 - Business as usual, installing and removing new R packages as needed
+
+--
+
 - `renv::snapshot()`: Save the state of the project library to the lockfile
+
+--
+
 - More business as usual
 - `renv::snapshot()`: Save project library again
+
+--
+
 - `renv::restore()`: Revert to the previous state as encoded in the lockfile if your attempts to update packages introduced some new problems.
 
 ---
@@ -475,7 +518,7 @@ Sounds about right to Office fans:
 
 # How about some flair?
 
-```{r, echo=FALSE, fig.align='center', out.height=100}
+```{r, echo=FALSE, fig.align='center', out.height=300}
 knitr::include_graphics('https://i.imgflip.com/1hzigk.jpg')
 ```
 
@@ -511,11 +554,11 @@ That's a simple fix: `renv::snapshot()` will update the lockfile.
 Next, revise your code with the appropriate number of flair:
 
 ```{r decorate, eval=FALSE}
-decorate('theoffice %>%
+decorate("theoffice %>%
   select(season, imdb_rating) %>%
   distinct() %>%
   group_by(season) %>%
-  summarize(avg_imdb = mean(imdb_rating))') %>%
+  summarize(avg_imdb = mean(imdb_rating))") %>%
   flair('%>%') %>%
   flair('theoffice', background='Coral') %>%
   flair('mean', background='Aquamarine')
@@ -524,8 +567,6 @@ decorate('theoffice %>%
 ````{r, echo=F, out.height=300, fig.align='center'}
 knitr::include_graphics("img/flair.png")
 ````
-
----
 
 ---
 
@@ -549,6 +590,12 @@ knitr::include_graphics("img/project-library.png")
 # Deeper dive
 
 - `renv::snapshot()`: saves state of project to lockfile (`renv.lock`)
+
+
+```{r echo=F, out.width=300, fig.align='left'}
+  knitr::include_graphics('img/lockfile.png')
+```
+
 
 --
 
@@ -589,20 +636,53 @@ The `DESCRIPTION` file of a package is used to infer the source
 
 As in the `schrute`/`flair` example, collaboration is easiest with a centrol version control repository (like GitHub)
 
--- 
-Collaborators can run `renv::init()` from `renv.lock` included in repository. 
+--
 
--- 
+Collaborators can: 
 
-Collaborators can update lockfile with any packages they install via `renv::snapshot()` and then push updated lockfile to central repo. 
+1. Run `renv::init()` from `renv.lock` included in repository. 
+2. Update lockfile with any packages they install via `renv::snapshot()` 
+3. Push updated lockfile to central repo along with code
+
+---
+# Real world example
+
+--
+
+These slides!
+
+--
+
+We built these slides in `xaringan` using GitHub for collaboration. Due to differences in both packages and installed versions of R, the formatting was getting horribly mangled. 
+
+--
+
+So we practiced what we're preaching, made our versions of R consistent and used `renv` to manage the project. 
+
+--
+
+...and the slides rendered perfectly. 
+
+```{r echo=F, out.width=300, fig.align='center'}
+  knitr::include_graphics('https://media.giphy.com/media/zcCGBRQshGdt6/giphy.gif')
+```
+
 
 
 ---
+
+.pull-left[
 # Use with Python
+]
+.pull-right[
+```{r echo=F, out.width=100, fig.align='right'}
+  knitr::include_graphics('https://rstudio.github.io/reticulate/images/reticulated_python.png')
+```
+]
 
-If your project uses both R and Python ,(hen `renv` can manage both!
+If your project uses both R and Python then `renv` can manage both!
 
----
+--
 
 Compatible with
 
@@ -624,6 +704,10 @@ Compatible with
 
 - `renv` has lots of options and flexibility but retains simplicity 
 
+--
+
+- Virtual environments offer another option to reinstalling packages during upgrades
+
 ---
 class: inverse, center, middle
 
@@ -631,10 +715,12 @@ class: inverse, center, middle
 
 ## Isabella Velásquez, @ivelasq3
 
+## Mike Garcia, @cascadianzeno
+
 ---
 # References
 
 ## More on `renv`
 
- [renv website](rstudio.github.io.renv)
+[renv website](rstudio.github.io.renv)
 

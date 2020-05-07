@@ -770,6 +770,13 @@
       "Repository": "CRAN",
       "Hash": "a064f646b3a692e62dfb5d9ea690a4ea"
     },
+    "tufte": {
+      "Package": "tufte",
+      "Version": "0.5",
+      "Source": "Repository",
+      "Repository": "CRAN",
+      "Hash": "b3abe186a41bfca541d5f60452709ad4"
+    },
     "usethis": {
       "Package": "usethis",
       "Version": "1.6.1",
