@@ -50,6 +50,10 @@ knitr::include_graphics('https://media1.tenor.com/images/4abc0a93a957de4c1db543e
 * `sort.list` for non-atomic objects
 * New color palettes
 * And a lot of other stuff!
+
+```{r, echo = FALSE, out.height = 250, fig.align='center'}
+knitr::include_graphics('img/cb.jpg')
+```
 --
 ...
 --
@@ -64,7 +68,7 @@ Self-identify and share something you may be worried about in the chat:
 * `r emo::ji("slightly_smiling_face")` Not too worried 
 * `r emo::ji("confused")` A little worried
 * `r emo::ji("fearful")` Very worried
-* `r emo::ji("dizzy_face")` Confused about why there'd be worry
+* `r emo::ji("dizzy_face")` Confused about why anyone is worried
 
 ---
 # What does it mean to upgrade a major version of R?
@@ -90,43 +94,38 @@ You can "start fresh" with no packages installed when you upgrade R.
 ```{r, echo=FALSE}
 knitr::include_graphics('img/brms.png')
 ```
+
 ---
 # Upgrade R // Reinstall All Packages
 
-You may want to be able to start working with R as soon as you update. If you are not worried about your package versions/want the newest versions of your packages...
+You may want to be able to start working with R as soon as you update.
 
 ## Reinstall After Updating
 
 <blockquote class="twitter-tweet"><p lang="en" dir="ltr">Dread of reinstalling all your <a href="https://twitter.com/hashtag/rstats?src=hash&amp;ref_src=twsrc%5Etfw">#rstats</a> packages keeping you from updating to R 4.0.0?💀Don&#39;t despair! This script will reinstall them after you update! Code here: <a href="https://t.co/5YnqmgqyUG">https://t.co/5YnqmgqyUG</a> <a href="https://t.co/VSivonPyWJ">pic.twitter.com/VSivonPyWJ</a></p>&mdash; Isabella Velásquez (@ivelasq3) <a href="https://twitter.com/ivelasq3/status/1253766376331902979?ref_src=twsrc%5Etfw">April 24, 2020</a></blockquote> <script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
 
----
-# Upgrade R // Reinstall All Packages
+## Other Options
 
-## Get a list of all your packages and then reinstall after updating
-
-<blockquote class="twitter-tweet"><p lang="en" dir="ltr">You&#39;re inevitably going to have to update to R 4.0.0 soon and as a result, you&#39;ll lose most of your packages and have to reinstall them. Here&#39;s a short script to keep a list of your current R packages and how to reinstall them after updating <a href="https://twitter.com/hashtag/rstats?src=hash&amp;ref_src=twsrc%5Etfw">#rstats</a> <a href="https://twitter.com/hashtag/statstwitter?src=hash&amp;ref_src=twsrc%5Etfw">#statstwitter</a> <a href="https://t.co/NI0ZeHze2C">pic.twitter.com/NI0ZeHze2C</a></p>&mdash; Sir Panda (@dailyzad) <a href="https://twitter.com/dailyzad/status/1253506170372980737?ref_src=twsrc%5Etfw">April 24, 2020</a></blockquote> <script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
-
----
-
-# Upgrade R // Reinstall All Packages
-
-## Formal Packages
-
-There are also formal packages to deal with reinstalling packages after a major R update: {installr}, {yamlpack}...
-
-## Things to Note
-
-* Make sure that the scripts work according to your process (for example, script 1 only works if you are downloading the binary 4.0.0)
-* Take note of your Bioconductor/Github dev packages
+* https://mobile.twitter.com/dailyzad/status/1253506170372980737
+* Formal packages: {installr}, {yamlpack}...
 
 ---
 # Upgrade R // Keep Old Packages
 
 If you want to keep the previous versions of your package but upgrade R, you can bring over the old versions.
 
-* Per ["What They Forgot To Teach You About R"](https://rstats.wtf/maintaining-r.html#how-to-transfer-your-library-when-updating-r), it is not advised to do this manually.
-* Additionally, if the packages were built on 3.x, then there’s no guarantee they’d work in 4.x.
-* R and packages can have system dependencies. Some of the packages may break if installed on R 4.0.0 and their  maintainers haven't upgraded their code yet.
+```{r, echo=FALSE}
+knitr::include_graphics('img/stringasfactors.jpg')
+```
+
+---
+# Think of your Dependencies
+
+```{r, echo=FALSE}
+knitr::include_graphics('https://im2.ezgif.com/tmp/ezgif-2-728a809f4f41.gif')
+```
+
+Source: https://twitter.com/andrewheiss/status/1021944992351186944?s=21
 
 ---
 # Do Not Upgrade R
@@ -140,42 +139,24 @@ knitr::include_graphics('https://media.giphy.com/media/IdmfEtnMWPzOg/200.gif')
 ---
 # Do Not Upgrade R
 
-```{r, echo=FALSE}
-knitr::include_graphics('img/stringasfactors.jpg')
-```
-
 Even if you’d rather wait for R v4.1.0, there are a few things you can do:
 
 * Test it out before you upgrade
 * Make it so you can switch between R versions: use RSwitch on macOS by @hrbrmstr
 
+```{r, echo = FALSE, out.height = 250, fig.align='center'}
+knitr::include_graphics('https://media0.giphy.com/media/xUA7aUNw61j9Vdzs0U/giphy.gif')
+```
+
 ---
-.pull-left[
-# Pros
-
-* "Hit the ground running"
-* Refinding packages not on CRAN
-* Dependencies
-* Internet speed
-
-]
-
-.pull-right[
-# Cons
-
-* Can’t have a ‘fresh start’
-* Dependencies
-* Packages may not work with new version of R
-
-]
-
-
-## Considerations
-
+. Considerations
 
 * How do you code?
-* How fragile in your code?
-* What do your dependencies look like?
+* How feasily can you refind your non-CRAN packages?
+* How ragile in your code?
+* WDo you want a 'fresh start'?
+* Will your packages work with R 4.0.0?
+* hat do your dependencies look like?
 * How fast is your internet?
 * How quick is your deadline?
 
@@ -189,8 +170,8 @@ Even if you’d rather wait for R v4.1.0, there are a few things you can do:
 * Conda
 * and....
 --
-*
- renv
+
+* renv
 
 ---
 class: inverse, center, middle
