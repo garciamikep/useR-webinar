@@ -1,0 +1,913 @@
+<!DOCTYPE html>
+<html lang="" xml:lang="">
+  <head>
+    <title>Package Management in R</title>
+    <meta charset="utf-8" />
+    <meta name="author" content="Isabella Velásquez, Bill &amp; Melinda Gates Foundation" />
+    <meta name="author" content="Mike Garcia, ProCogia" />
+    <link href="libs/remark-css-0.0.1/default.css" rel="stylesheet" />
+    <link href="libs/remark-css-0.0.1/default-fonts.css" rel="stylesheet" />
+    <script src="libs/kePrint-0.0.1/kePrint.js"></script>
+  </head>
+  <body>
+    <textarea id="source">
+class: center, middle, inverse, title-slide
+
+# Package Management in R
+### Isabella Velásquez, Bill &amp; Melinda Gates Foundation
+### Mike Garcia, ProCogia
+### May 7th, 2020
+
+---
+
+
+
+
+class: inverse, center, middle
+
+# Hello!
+
+
+Isabella Velásquez
+
+Twitter: @ivelasq3
+
+Website: ivelasq.rbind.io
+
+---
+class: inverse, center, middle
+
+# Upgrading R in the time of coronavirus
+
+&lt;img src="https://media1.tenor.com/images/4abc0a93a957de4c1db543ec3f4834a7/tenor.gif?itemid=13633421" height="500" style="display: block; margin: auto;" /&gt;
+
+---
+
+# R version 4.0.0 is out! 🌲
+
+## What’s new?
+
+* `list2DF`
+* `sort.list` for non-atomic objects
+* New color palettes
+* And a lot of other stuff!
+
+&lt;img src="img/cb.jpg" height="250" style="display: block; margin: auto;" /&gt;
+--
+...
+--
+and, `stringsAsFactors = FALSE`
+---
+
+# Chat
+
+How do you feel about upgrading R?
+Self-identify and share something you may be worried about in the chat:
+
+* 😎 Already upgraded
+* 😀 Not worried 
+* 🙂 Not too worried 
+* 😕 A little worried
+* 😨 Very worried
+* 😵 Confused about why anyone is worried
+
+---
+# What does it mean to upgrade a major version of R?
+
+&lt;img src="https://giffiles.alphacoders.com/168/168275.gif" height="250" style="display: block; margin: auto;" /&gt;
+
+* For some - apprehension!
+* For others - opportunity!
+
+---
+# What's wrong with reinstalling packages?
+
+--
+
+😨 😨 😨
+
+&lt;img src="img/not_found.png" height="250" style="display: block; margin: auto;" /&gt;
+
+---
+
+# Upgrade R // Install As You Go
+
+You can "start fresh" with no packages installed when you upgrade R. 
+
+&lt;img src="https://i.kym-cdn.com/entries/icons/original/000/006/077/so_good.png" height="250" style="display: block; margin: auto;" /&gt;
+
+* Another option is to use {pacman} that installs packages that are not already installed but mentioned in code.
+* For previously written scripts, RStudio provides a helpful message if it detects a package that is not installed.
+
+![](img/brms.png)&lt;!-- --&gt;
+
+---
+# Upgrade R // Reinstall All Packages
+
+
+```r
+# setup
+if (!require(tidyverse)) install.packages("tidyverse")
+if (!require(fs)) install.packages("fs")
+library(tidyverse)
+library(fs)
+```
+
+--
+
+
+```r
+# get all installed R versions
+if (Sys.info()[["sysname"]] == "Darwin") { 
+  r_dir &lt;- tibble::tibble(path = fs::dir_ls(fs::path_dir(fs::path_dir(fs::path_dir(.libPaths()[[1]])))))
+}
+if (Sys.info()[["sysname"]] %in% c("Linux", "Windows")) {
+  r_dir &lt;- tibble::tibble(path = fs::dir_ls(fs::path_dir(.libPaths()[[1]])))
+}
+```
+
+---
+
+
+```r
+# cue music
+r_dir &lt;- r_dir %&gt;%
+  # drop current R version
+  dplyr::filter(!(stringr::str_detect(path, "Current"))) %&gt;%
+  # extract the current and penultimate R versions as strings
+  dplyr::rowwise() %&gt;%
+  dplyr::mutate(version = as.numeric(stringr::str_extract(path, "[0-9]\\.[0-9]"))) %&gt;%
+  dplyr::ungroup() %&gt;%
+  dplyr::mutate(new_r = dplyr::nth(version, -1L), old_r = dplyr::nth(version, -2L)) %&gt;%
+  dplyr::mutate_at(vars("new_r", "old_r"), ~as.character(formatC(.x, digits = 1L, format = "f"))) %&gt;%
+  dplyr::filter(version == old_r)
+```
+
+--
+
+
+```r
+# get new and old R library paths
+new_libpath &lt;- .libPaths()
+old_libpath &lt;- stringr::str_replace(new_libpath, r_dir$new_r, r_dir$old_r)
+# get list of old installed R packages
+pkg_list &lt;- as.list(list.files(old_libpath))
+```
+
+---
+
+
+```r
+# get new and old R library paths
+new_libpath &lt;- .libPaths()
+old_libpath &lt;- stringr::str_replace(new_libpath, r_dir$new_r, r_dir$old_r)
+# get list of old installed R packages
+pkg_list &lt;- as.list(list.files(old_libpath))
+```
+
+--
+
+
+```r
+# define install_all() function
+install_all &lt;- function(x) {
+  print(x)
+  install.packages(x, quiet = TRUE)
+}
+```
+
+--
+
+
+```r
+# install all R packages in pkg_list
+purrr::quietly(purrr::walk(pkg_list, install_all))
+```
+
+---
+# Upgrade R // Reinstall All Packages
+
+## Other Options
+
+&lt;img src="img/script.png" height="250" style="display: block; margin: auto;" /&gt;
+
+* Formal packages: {installr}, {yamlpack}...
+
+---
+# Upgrade R // Keep Old Packages
+
+If you want to keep the previous versions of your package but upgrade R, you can bring over the old versions.
+
+![](img/donot.png)&lt;!-- --&gt;
+
+![](img/stringasfactors.jpg)&lt;!-- --&gt;
+
+.footnote[
+Warning image from https://rstats.wtf/maintaining-r.html
+]
+
+---
+# Think of your Dependencies
+
+&lt;blockquote class="twitter-tweet"&gt;&lt;p lang="und" dir="ltr"&gt; &lt;a href="https://t.co/xtfH4w3SiP"&gt;pic.twitter.com/xtfH4w3SiP&lt;/a&gt;&lt;/p&gt;&amp;mdash; Andrew Heiss (@andrewheiss) &lt;a href="https://twitter.com/andrewheiss/status/1021944992351186944?ref_src=twsrc%5Etfw"&gt;July 25, 2018&lt;/a&gt;&lt;/blockquote&gt; &lt;script async src="https://platform.twitter.com/widgets.js" charset="utf-8"&gt;&lt;/script&gt;
+
+---
+# Do Not Upgrade R
+
+&lt;blockquote class="twitter-tweet"&gt;&lt;p lang="en" dir="ltr"&gt;Yeah, I&amp;#39;m just gonna act like &lt;a href="https://twitter.com/hashtag/rstats?src=hash&amp;amp;ref_src=twsrc%5Etfw"&gt;#rstats&lt;/a&gt; 4.0 doesn&amp;#39;t exist until I finish these papers. &lt;br&gt;MRAN January snapshot continues! &lt;a href="https://t.co/RrFCR86kcV"&gt;pic.twitter.com/RrFCR86kcV&lt;/a&gt;&lt;/p&gt;&amp;mdash; Chase Clark (@ChasingMicrobes) &lt;a href="https://twitter.com/ChasingMicrobes/status/1253036167941021696?ref_src=twsrc%5Etfw"&gt;April 22, 2020&lt;/a&gt;&lt;/blockquote&gt; &lt;script async src="https://platform.twitter.com/widgets.js" charset="utf-8"&gt;&lt;/script&gt;
+
+---
+# Do Not Upgrade R
+
+Even if you’d rather wait for R v4.1.0, there are a few things you can do:
+
+* Test it out before you upgrade
+* Make it so you can switch between R versions: use RSwitch on macOS by @hrbrmstr
+
+&lt;img src="https://media0.giphy.com/media/xUA7aUNw61j9Vdzs0U/giphy.gif" height="250" style="display: block; margin: auto;" /&gt;
+
+---
+# Considerations
+
+* How do you code?
+* How feasily can you refind your non-CRAN packages?
+* How fragile is your code?
+* Do you want a 'fresh start'?
+* Will your packages work with R 4.0.0?
+* What do your dependencies look like?
+* How fast is your internet?
+* How quick is your deadline?
+
+--
+
+&lt;img src="img/error.png" height="200" style="display: block; margin: auto;" /&gt;
+
+---
+
+# Other Options
+
+* packrat (old RStudio package management solution)
+* RStudio Package Manager
+* Docker (rocker)
+* Conda
+* and....
+--
+
+* renv
+
+---
+class: inverse, center, middle
+
+# Hello!
+
+Mike Garcia
+
+Twitter: @cascadianzeno
+
+Email: mike@procogia.com
+
+---
+class: inverse, center, middle
+
+# Package management in projects
+
+&lt;img src="img/renv-hex.svg" height="300" /&gt;
+
+---
+
+# Poll
+
+What is your opinion/familiarity with Python?
+
+* 🐍 What's Python? I don't like snakes!!
+* 👼 I love R and use Python sparingly if at all
+* 👿 I love Python and use R sparingly if at all
+* 🤷 I'm an equal opportunity programmer and will use any tool to get the job done
+
+---
+# A brief history of my programming past:
+
+&lt;img src="img/mike-timeline.png" height="200" style="display: block; margin: auto;" /&gt;
+
+--
+
+&gt; A language that doesn't affect the way you think about programming, is not worth knowing.
+&gt; 
+&gt; &lt;footer&gt;--- Alan Perlis&lt;/footer&gt;
+
+---
+# Some things I've learned from Python:
+
+&lt;img src="https://upload.wikimedia.org/wikipedia/commons/thumb/c/c3/Python-logo-notext.svg/1200px-Python-logo-notext.svg.png" width="50" style="display: block; margin: auto auto auto 0;" /&gt;
+
+.pull-left[ 
+
+Virtual environments are a big thing and use of package management tools is widespread in Python community:
+    
+  - `pipenv`
+  - `virtualenv`
+  - `venv`
+  - `pyvenv`
+  
+  ]
+
+.pull-right[
+  This is a good thing!
+  
+  - Better reproducibility
+  - Isolate project dependencies
+  - Use different versions of same package for different projects
+  
+]
+
+---
+# Reproducible data science with R 
+
+&lt;img src="https://www.r-project.org/logo/Rlogo.png" width="50" style="display: block; margin: auto auto auto 0;" /&gt;
+
+.pull-left[
+
+  ###  Literate programming:
+
+ Strong tradition in R community:
+ 
+  - Sweave 
+  - knitr
+  - Markdown
+]
+
+.pull-right[
+
+  ### Package management:
+
+  Less of a focus in the community until recently.
+  
+  - Packrat
+]
+
+---
+
+.pull-left[
+## Introducing: `renv`
+]
+.pull-right[
+&lt;img src="img/renv-hex.svg" width="100" style="display: block; margin: auto 0 auto auto;" /&gt;
+]
+
+
+- Oct 2019: `renv 0.8.0` released on CRAN 
+- Feb 2020: latest release (`renv 0.9.3`)
+
+Goal is for `renv` to be a stable replacement to `Packrat`
+
+--
+
+### Philosophy of `renv` 
+
+&gt; Any of your existing workflows should just work as they did before
+
+---
+# Workflow overview:
+
+
+- `renv::init()`: Initialize a new project-local environment with a private R library
+
+--
+
+- Business as usual, installing and removing new R packages as needed
+
+--
+
+- `renv::snapshot()`: Save the state of the project library to the lockfile
+
+--
+
+- More business as usual
+- `renv::snapshot()`: Save project library again
+
+--
+
+- `renv::restore()`: Revert to the previous state as encoded in the lockfile if your attempts to update packages introduced some new problems.
+
+---
+# schrute package
+
+--
+
+The entire transcript from The Office
+--
+...
+--
+in Tidy Format!
+
+
+&lt;img src="https://media3.giphy.com/media/lMVNl6XxTvXgs/200w.webp?cid=ecf05e47ff356c33f2489eefdcfff62be8ab2bca7b24bab2&amp;rid=200w.webp" height="300" style="display: block; margin: auto;" /&gt;
+
+---
+
+Available on CRAN:
+
+```r
+# install.packages("schrute")
+library(schrute)
+
+data(theoffice)
+head(theoffice)
+```
+
+&lt;table class="table table-striped table-hover table-condensed table-responsive" style="font-size: 7px; margin-left: auto; margin-right: auto;"&gt;
+ &lt;thead&gt;
+  &lt;tr&gt;
+   &lt;th style="text-align:right;"&gt; index &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; season &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; episode &lt;/th&gt;
+   &lt;th style="text-align:left;"&gt; episode_name &lt;/th&gt;
+   &lt;th style="text-align:left;"&gt; director &lt;/th&gt;
+   &lt;th style="text-align:left;"&gt; writer &lt;/th&gt;
+   &lt;th style="text-align:left;"&gt; character &lt;/th&gt;
+   &lt;th style="text-align:left;"&gt; text &lt;/th&gt;
+   &lt;th style="text-align:left;"&gt; text_w_direction &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; imdb_rating &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; total_votes &lt;/th&gt;
+   &lt;th style="text-align:left;"&gt; air_date &lt;/th&gt;
+  &lt;/tr&gt;
+ &lt;/thead&gt;
+&lt;tbody&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:right;"&gt; 1 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 1 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 1 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; Pilot &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; Ken Kwapis &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; Ricky Gervais;Stephen Merchant;Greg Daniels &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; Michael &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; All right Jim. Your quarterlies look very good. How are things at the library? &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; All right Jim. Your quarterlies look very good. How are things at the library? &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 7.6 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 3706 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 2005-03-24 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:right;"&gt; 2 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 1 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 1 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; Pilot &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; Ken Kwapis &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; Ricky Gervais;Stephen Merchant;Greg Daniels &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; Jim &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; Oh, I told you. I couldn't close it. So... &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; Oh, I told you. I couldn't close it. So... &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 7.6 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 3706 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 2005-03-24 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:right;"&gt; 3 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 1 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 1 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; Pilot &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; Ken Kwapis &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; Ricky Gervais;Stephen Merchant;Greg Daniels &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; Michael &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; So you've come to the master for guidance? Is this what you're saying, grasshopper? &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; So you've come to the master for guidance? Is this what you're saying, grasshopper? &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 7.6 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 3706 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 2005-03-24 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:right;"&gt; 4 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 1 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 1 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; Pilot &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; Ken Kwapis &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; Ricky Gervais;Stephen Merchant;Greg Daniels &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; Jim &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; Actually, you called me in here, but yeah. &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; Actually, you called me in here, but yeah. &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 7.6 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 3706 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 2005-03-24 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:right;"&gt; 5 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 1 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 1 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; Pilot &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; Ken Kwapis &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; Ricky Gervais;Stephen Merchant;Greg Daniels &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; Michael &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; All right. Well, let me show you how it's done. &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; All right. Well, let me show you how it's done. &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 7.6 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 3706 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 2005-03-24 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:right;"&gt; 6 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 1 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 1 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; Pilot &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; Ken Kwapis &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; Ricky Gervais;Stephen Merchant;Greg Daniels &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; Michael &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; Yes, I'd like to speak to your office manager, please. Yes, hello. This is Michael Scott. I am the Regional Manager of Dunder Mifflin Paper Products. Just wanted to talk to you manager-a-manger. All right. Done deal. Thank you very much, sir. You're a gentleman and a scholar. Oh, I'm sorry. OK. I'm sorry. My mistake. That was a woman I was talking to, so... She had a very low voice. Probably a smoker, so... So that's the way it's done. &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; [on the phone] Yes, I'd like to speak to your office manager, please. Yes, hello. This is Michael Scott. I am the Regional Manager of Dunder Mifflin Paper Products. Just wanted to talk to you manager-a-manger. [quick cut scene] All right. Done deal. Thank you very much, sir. You're a gentleman and a scholar. Oh, I'm sorry. OK. I'm sorry. My mistake. [hangs up] That was a woman I was talking to, so... She had a very low voice. Probably a smoker, so... [Clears throat] So that's the way it's done. &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 7.6 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 3706 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 2005-03-24 &lt;/td&gt;
+  &lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+
+---
+
+Being good package managers and reproducible data scientists, let's
+
+1. Start an R project
+2. Start a reproducible report in R Markdown &lt;sup&gt;1&lt;/sup&gt;
+3. Set up `renv`:
+
+
+```r
+renv::init()
+```
+
+This will initialize a `lockfile` with all packages and dependencies detected in the project. 
+
+.footnote[
+[1] For our purposes, the R Markdown part will be make-believe. I'll just show the results in the slides
+]
+
+---
+Let's look at average IMDB ratings over the seasons:
+
+
+```r
+theoffice %&gt;% 
+  select(season, imdb_rating) %&gt;% 
+  distinct() %&gt;% 
+  group_by(season) %&gt;% 
+  summarize(avg_imdb = mean(imdb_rating))
+```
+
+```
+## # A tibble: 9 x 2
+##   season avg_imdb
+##    &lt;int&gt;    &lt;dbl&gt;
+## 1      1     8.02
+## 2      2     8.53
+## 3      3     8.64
+## 4      4     8.5 
+## 5      5     8.65
+## 6      6     8.18
+## 7      7     8.49
+## 8      8     7.55
+## 9      9     8.05
+```
+
+---
+## Make a quick ggplot...
+
+.pull-left[
+![](useR-slides_files/figure-html/unnamed-chunk-27-1.png)&lt;!-- --&gt;
+]
+
+.pull-right[
+Sounds about right to Office fans:
+
+- First few seasons were great
+- Slump in middle
+- Things got weird at the end
+- Slight recovery with final season
+
+]
+
+---
+# Share with the world!
+
+- You share code on GitHub
+- Eager to build on your groundbreaking results, collaborators fork your repo
+
+---
+
+# How about some flair?
+
+&lt;img src="https://i.imgflip.com/1hzigk.jpg" height="300" style="display: block; margin: auto;" /&gt;
+
+--
+
+After all your hard work on your report that you've now shared with the world, you find out about the brand new `flair` package &lt;sup&gt;1&lt;/sup&gt;. 
+
+This is a perfect way to highlight those tricky code bits to help your co-workers learn R.
+
+.footnote[
+[1] Just released on May 4th!
+]
+
+---
+
+# Install from CRAN
+
+
+```r
+install.packages("flair")
+```
+
+--
+
+Now our lockfile is out of date! 
+
+
+--
+
+That's a simple fix: `renv::snapshot()` will update the lockfile. 
+
+--
+
+Next, revise your code with the appropriate number of flair:
+
+
+```r
+decorate("theoffice %&gt;%
+  select(season, imdb_rating) %&gt;%
+  distinct() %&gt;%
+  group_by(season) %&gt;%
+  summarize(avg_imdb = mean(imdb_rating))") %&gt;%
+  flair('%&gt;%') %&gt;%
+  flair('theoffice', background='Coral') %&gt;%
+  flair('mean', background='Aquamarine')
+```
+---
+&lt;img src="img/flair.png" height="300" style="display: block; margin: auto;" /&gt;
+
+---
+
+# Deeper dive
+
+`renv::init()` creates:
+
+- lockfile named `renv.lock`
+- project-local environment with private library (`renv/library`)
+  - separate from system libary
+  - created by crawling for dependencies with `renv::dependencies()`
+  - Packages copied from user library if already installed
+    - Instead of re-installing from CRAN
+
+&lt;img src="img/project-library.png" height="200" style="display: block; margin: auto;" /&gt;
+
+---
+
+# Deeper dive
+
+- `renv::snapshot()`: saves state of project to lockfile (`renv.lock`)
+
+
+&lt;img src="img/lockfile.png" width="300" style="display: block; margin: auto auto auto 0;" /&gt;
+
+
+--
+
+- `renv::restore()`: reverts to previous state of lockfile if package installation attempts are unsuccessful
+
+
+---
+
+# Package sources
+
+Compatible with 
+
+- CRAN
+- GitHub
+- BioConductor
+- GitLab
+- Bitbucket
+- Custom/local packages
+
+The `DESCRIPTION` file of a package is used to infer the source
+
+---
+# Comparison with Packrat&lt;sup&gt;1&lt;/sup&gt;:
+
+1. `renv.lock` is a JSON file, ease of use with other tools
+2. `renv` doesn't attempt to track package tarballs
+3. `renv` doesn't track "stale" packages, installed but not recorded in lockfile
+4. `renv` uses a global cache across all projects maintained with `renv`, reducing disk space
+5. More configurable dependency discovery
+
+.footnote[
+[1] Abbreviated from `renv` documentation website
+]
+
+---
+
+# Collaboration
+
+As in the `schrute`/`flair` example, collaboration is easiest with a centrol version control repository (like GitHub)
+
+--
+
+Collaborators can: 
+
+1. Run `renv::init()` from `renv.lock` included in repository. 
+2. Update lockfile with any packages they install via `renv::snapshot()` 
+3. Push updated lockfile to central repo along with code
+
+---
+# Real world example
+
+--
+
+These slides!
+
+--
+
+We built these slides in `xaringan` using GitHub for collaboration. Due to differences in both packages and installed versions of R, the formatting was getting horribly mangled. 
+
+--
+
+So we practiced what we're preaching, made our versions of R consistent and used `renv` to manage the project. 
+
+--
+
+...and the slides rendered perfectly. 
+
+&lt;img src="https://media.giphy.com/media/zcCGBRQshGdt6/giphy.gif" width="300" style="display: block; margin: auto;" /&gt;
+
+
+
+---
+
+.pull-left[
+# Use with Python
+]
+.pull-right[
+&lt;img src="https://rstudio.github.io/reticulate/images/reticulated_python.png" width="100" style="display: block; margin: auto 0 auto auto;" /&gt;
+]
+
+If your project uses both R and Python then `renv` can manage both!
+
+--
+
+Compatible with
+
+- `reticulate`
+- Virtual environments
+- Conda environments
+
+---
+
+# Conclusion
+
+- Learning a new language can motivate you to improve skills in a language you already know
+
+--
+
+- R has an exciting new option for improving reproducibility even more
+
+--
+
+- `renv` has lots of options and flexibility but retains simplicity 
+
+--
+
+- Virtual environments offer another option to reinstalling packages during upgrades
+
+---
+class: inverse, center, middle
+
+# Questions?
+
+## Isabella Velásquez, @ivelasq3
+
+## Mike Garcia, @cascadianzeno
+
+---
+# References
+
+## More on `renv`
+
+[renv website](rstudio.github.io.renv)
+    </textarea>
+<style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
+<script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>
+<script>var slideshow = remark.create({
+"highlightStyle": "github",
+"highlightLines": true,
+"countIncrementalSlides": false
+});
+if (window.HTMLWidgets) slideshow.on('afterShowSlide', function (slide) {
+  window.dispatchEvent(new Event('resize'));
+});
+(function(d) {
+  var s = d.createElement("style"), r = d.querySelector(".remark-slide-scaler");
+  if (!r) return;
+  s.type = "text/css"; s.innerHTML = "@page {size: " + r.style.width + " " + r.style.height +"; }";
+  d.head.appendChild(s);
+})(document);
+
+(function(d) {
+  var el = d.getElementsByClassName("remark-slides-area");
+  if (!el) return;
+  var slide, slides = slideshow.getSlides(), els = el[0].children;
+  for (var i = 1; i < slides.length; i++) {
+    slide = slides[i];
+    if (slide.properties.continued === "true" || slide.properties.count === "false") {
+      els[i - 1].className += ' has-continuation';
+    }
+  }
+  var s = d.createElement("style");
+  s.type = "text/css"; s.innerHTML = "@media print { .has-continuation { display: none; } }";
+  d.head.appendChild(s);
+})(document);
+// delete the temporary CSS (for displaying all slides initially) when the user
+// starts to view slides
+(function() {
+  var deleted = false;
+  slideshow.on('beforeShowSlide', function(slide) {
+    if (deleted) return;
+    var sheets = document.styleSheets, node;
+    for (var i = 0; i < sheets.length; i++) {
+      node = sheets[i].ownerNode;
+      if (node.dataset["target"] !== "print-only") continue;
+      node.parentNode.removeChild(node);
+    }
+    deleted = true;
+  });
+})();
+(function() {
+  "use strict"
+  // Replace <script> tags in slides area to make them executable
+  var scripts = document.querySelectorAll(
+    '.remark-slides-area .remark-slide-container script'
+  );
+  if (!scripts.length) return;
+  for (var i = 0; i < scripts.length; i++) {
+    var s = document.createElement('script');
+    var code = document.createTextNode(scripts[i].textContent);
+    s.appendChild(code);
+    var scriptAttrs = scripts[i].attributes;
+    for (var j = 0; j < scriptAttrs.length; j++) {
+      s.setAttribute(scriptAttrs[j].name, scriptAttrs[j].value);
+    }
+    scripts[i].parentElement.replaceChild(s, scripts[i]);
+  }
+})();
+(function() {
+  var links = document.getElementsByTagName('a');
+  for (var i = 0; i < links.length; i++) {
+    if (/^(https?:)?\/\//.test(links[i].getAttribute('href'))) {
+      links[i].target = '_blank';
+    }
+  }
+})();
+// adds .remark-code-has-line-highlighted class to <pre> parent elements
+// of code chunks containing highlighted lines with class .remark-code-line-highlighted
+(function(d) {
+  const hlines = d.querySelectorAll('.remark-code-line-highlighted');
+  const preParents = [];
+  const findPreParent = function(line, p = 0) {
+    if (p > 1) return null; // traverse up no further than grandparent
+    const el = line.parentElement;
+    return el.tagName === "PRE" ? el : findPreParent(el, ++p);
+  };
+
+  for (let line of hlines) {
+    let pre = findPreParent(line);
+    if (pre && !preParents.includes(pre)) preParents.push(pre);
+  }
+  preParents.forEach(p => p.classList.add("remark-code-has-line-highlighted"));
+})(document);</script>
+
+<script>
+slideshow._releaseMath = function(el) {
+  var i, text, code, codes = el.getElementsByTagName('code');
+  for (i = 0; i < codes.length;) {
+    code = codes[i];
+    if (code.parentNode.tagName !== 'PRE' && code.childElementCount === 0) {
+      text = code.textContent;
+      if (/^\\\((.|\s)+\\\)$/.test(text) || /^\\\[(.|\s)+\\\]$/.test(text) ||
+          /^\$\$(.|\s)+\$\$$/.test(text) ||
+          /^\\begin\{([^}]+)\}(.|\s)+\\end\{[^}]+\}$/.test(text)) {
+        code.outerHTML = code.innerHTML;  // remove <code></code>
+        continue;
+      }
+    }
+    i++;
+  }
+};
+slideshow._releaseMath(document);
+</script>
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+(function () {
+  var script = document.createElement('script');
+  script.type = 'text/javascript';
+  script.src  = 'https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-MML-AM_CHTML';
+  if (location.protocol !== 'file:' && /^https?:/.test(script.src))
+    script.src  = script.src.replace(/^https?:/, '');
+  document.getElementsByTagName('head')[0].appendChild(script);
+})();
+</script>
+  </body>
+</html>
