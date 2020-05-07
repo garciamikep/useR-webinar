@@ -31,6 +31,16 @@ class: inverse, center, middle
 #Welcome/Intro/Overview/Background
 
 ---
+class: inverse, center, middle
+
+# Hello!
+
+
+Isabella Velásquez
+
+Twitter: @ivelasq3
+
+Website: ivelasq.rbind.io
 
 ---
 class: inverse, center, middle
@@ -42,6 +52,7 @@ knitr::include_graphics('https://media1.tenor.com/images/4abc0a93a957de4c1db543e
 ```
 
 ---
+
 # R version 4.0.0 is out! `r emo::ji("evergreen_tree")`
 
 ## What’s new?
@@ -60,11 +71,13 @@ knitr::include_graphics('img/cb.jpg')
 and, `stringsAsFactors = FALSE`
 ---
 
-# How do you feel about upgrading R?
+# Chat
 
+How do you feel about upgrading R?
 Self-identify and share something you may be worried about in the chat:
 
-* `r emo::ji("sunglasses")` Not worried 
+* `r emo::ji("sunglasses")` Already upgraded
+* `r emo::ji("grinning_face")` Not worried 
 * `r emo::ji("slightly_smiling_face")` Not too worried 
 * `r emo::ji("confused")` A little worried
 * `r emo::ji("fearful")` Very worried
@@ -76,19 +89,32 @@ Self-identify and share something you may be worried about in the chat:
 ```{r, echo = FALSE, out.height = 250, fig.align='center'}
 knitr::include_graphics('https://giffiles.alphacoders.com/168/168275.gif')
 ```
---
 
 * For some - apprehension!
 * For others - opportunity!
 
 ---
+# What's wrong with reinstalling packages?
+
+--
+
+`r emo::ji("fearful")` `r emo::ji("fearful")` `r emo::ji("fearful")`
+
+```{r, echo = FALSE, out.height = 250, fig.align='center'}
+knitr::include_graphics('img/not_found.png')
+```
+
+---
 
 # Upgrade R // Install As You Go
 
-You can "start fresh" with no packages installed when you upgrade R.
+You can "start fresh" with no packages installed when you upgrade R. 
 
-* As you write scripts that need packages, then you can install them as you go.
-* Another option is to use {pacman}, that installs packages that are not already installed but mentioned in code.
+```{r, echo=FALSE, out.height=250, fig.align='center'}
+knitr::include_graphics('https://i.kym-cdn.com/entries/icons/original/000/006/077/so_good.png')
+```
+
+* Another option is to use {pacman} that installs packages that are not already installed but mentioned in code.
 * For previously written scripts, RStudio provides a helpful message if it detects a package that is not installed.
 
 ```{r, echo=FALSE}
@@ -98,15 +124,88 @@ knitr::include_graphics('img/brms.png')
 ---
 # Upgrade R // Reinstall All Packages
 
-You may want to be able to start working with R as soon as you update.
+```{r, eval = F}
+# setup
+if (!require(tidyverse)) install.packages("tidyverse")
+if (!require(fs)) install.packages("fs")
+library(tidyverse)
+library(fs)
+```
 
-## Reinstall After Updating
+--
 
-<blockquote class="twitter-tweet"><p lang="en" dir="ltr">Dread of reinstalling all your <a href="https://twitter.com/hashtag/rstats?src=hash&amp;ref_src=twsrc%5Etfw">#rstats</a> packages keeping you from updating to R 4.0.0?💀Don&#39;t despair! This script will reinstall them after you update! Code here: <a href="https://t.co/5YnqmgqyUG">https://t.co/5YnqmgqyUG</a> <a href="https://t.co/VSivonPyWJ">pic.twitter.com/VSivonPyWJ</a></p>&mdash; Isabella Velásquez (@ivelasq3) <a href="https://twitter.com/ivelasq3/status/1253766376331902979?ref_src=twsrc%5Etfw">April 24, 2020</a></blockquote> <script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
+```{r, eval = F}
+# get all installed R versions
+if (Sys.info()[["sysname"]] == "Darwin") { 
+  r_dir <- tibble::tibble(path = fs::dir_ls(fs::path_dir(fs::path_dir(fs::path_dir(.libPaths()[[1]])))))
+}
+if (Sys.info()[["sysname"]] %in% c("Linux", "Windows")) {
+  r_dir <- tibble::tibble(path = fs::dir_ls(fs::path_dir(.libPaths()[[1]])))
+}
+```
+
+---
+
+```{r, eval = F}
+# cue music
+r_dir <- r_dir %>%
+  # drop current R version
+  dplyr::filter(!(stringr::str_detect(path, "Current"))) %>%
+  # extract the current and penultimate R versions as strings
+  dplyr::rowwise() %>%
+  dplyr::mutate(version = as.numeric(stringr::str_extract(path, "[0-9]\\.[0-9]"))) %>%
+  dplyr::ungroup() %>%
+  dplyr::mutate(new_r = dplyr::nth(version, -1L), old_r = dplyr::nth(version, -2L)) %>%
+  dplyr::mutate_at(vars("new_r", "old_r"), ~as.character(formatC(.x, digits = 1L, format = "f"))) %>%
+  dplyr::filter(version == old_r)
+```
+
+--
+
+```{r, eval = F}
+# get new and old R library paths
+new_libpath <- .libPaths()
+old_libpath <- stringr::str_replace(new_libpath, r_dir$new_r, r_dir$old_r)
+# get list of old installed R packages
+pkg_list <- as.list(list.files(old_libpath))
+```
+
+---
+
+```{r, eval = F}
+# get new and old R library paths
+new_libpath <- .libPaths()
+old_libpath <- stringr::str_replace(new_libpath, r_dir$new_r, r_dir$old_r)
+# get list of old installed R packages
+pkg_list <- as.list(list.files(old_libpath))
+```
+
+--
+
+```{r, eval = F}
+# define install_all() function
+install_all <- function(x) {
+  print(x)
+  install.packages(x, quiet = TRUE)
+}
+```
+
+--
+
+```{r, eval = F}
+# install all R packages in pkg_list
+purrr::quietly(purrr::walk(pkg_list, install_all))
+```
+
+---
+# Upgrade R // Reinstall All Packages
 
 ## Other Options
 
-* https://mobile.twitter.com/dailyzad/status/1253506170372980737
+```{r, echo=FALSE, out.height=250,fig.align='center'}
+knitr::include_graphics('img/script.png')
+```
+
 * Formal packages: {installr}, {yamlpack}...
 
 ---
@@ -115,26 +214,26 @@ You may want to be able to start working with R as soon as you update.
 If you want to keep the previous versions of your package but upgrade R, you can bring over the old versions.
 
 ```{r, echo=FALSE}
+knitr::include_graphics('img/donot.png')
+```
+
+```{r, echo=FALSE}
 knitr::include_graphics('img/stringasfactors.jpg')
 ```
+
+.footnote[
+Warning image from https://rstats.wtf/maintaining-r.html
+]
 
 ---
 # Think of your Dependencies
 
-```{r, echo=FALSE}
-knitr::include_graphics('https://im2.ezgif.com/tmp/ezgif-2-728a809f4f41.gif')
-```
-
-Source: https://twitter.com/andrewheiss/status/1021944992351186944?s=21
+<blockquote class="twitter-tweet"><p lang="und" dir="ltr"> <a href="https://t.co/xtfH4w3SiP">pic.twitter.com/xtfH4w3SiP</a></p>&mdash; Andrew Heiss (@andrewheiss) <a href="https://twitter.com/andrewheiss/status/1021944992351186944?ref_src=twsrc%5Etfw">July 25, 2018</a></blockquote> <script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
 
 ---
 # Do Not Upgrade R
 
 <blockquote class="twitter-tweet"><p lang="en" dir="ltr">Yeah, I&#39;m just gonna act like <a href="https://twitter.com/hashtag/rstats?src=hash&amp;ref_src=twsrc%5Etfw">#rstats</a> 4.0 doesn&#39;t exist until I finish these papers. <br>MRAN January snapshot continues! <a href="https://t.co/RrFCR86kcV">pic.twitter.com/RrFCR86kcV</a></p>&mdash; Chase Clark (@ChasingMicrobes) <a href="https://twitter.com/ChasingMicrobes/status/1253036167941021696?ref_src=twsrc%5Etfw">April 22, 2020</a></blockquote> <script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
-
-```{r, echo = FALSE, out.height = 250, fig.align='center'}
-knitr::include_graphics('https://media.giphy.com/media/IdmfEtnMWPzOg/200.gif')
-```
 
 ---
 # Do Not Upgrade R
@@ -149,16 +248,22 @@ knitr::include_graphics('https://media0.giphy.com/media/xUA7aUNw61j9Vdzs0U/giphy
 ```
 
 ---
-. Considerations
+# Considerations
 
 * How do you code?
 * How feasily can you refind your non-CRAN packages?
-* How ragile in your code?
-* WDo you want a 'fresh start'?
+* How fragile in your code?
+* Do you want a 'fresh start'?
 * Will your packages work with R 4.0.0?
-* hat do your dependencies look like?
+* What do your dependencies look like?
 * How fast is your internet?
 * How quick is your deadline?
+
+--
+
+```{r, echo=FALSE, fig.align='center', out.height=200}
+knitr::include_graphics("img/error.png")
+```
 
 ---
 
@@ -519,24 +624,17 @@ Compatible with
 
 - `renv` has lots of options and flexibility but retains simplicity 
 
---
+---
 class: inverse, center, middle
 
-# Cuestions?
+# Questions?
+
+## Isabella Velásquez, @ivelasq3
 
 ---
 # References
 
-## What's New
-
-* [Four New Useful Features in R 4.0.0](https://www.r-bloggers.com/4-for-4-0-0-four-useful-new-features-in-r-4-0-0/)
-* [R 4.0.0 Now Available](https://www.r-bloggers.com/r-4-0-0-now-available-and-a-look-back-at-rs-history/
-)
-*
 ## More on `renv`
 
  [renv website](rstudio.github.io.renv)
-
-
-
 

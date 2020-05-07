@@ -29,6 +29,16 @@ class: inverse, center, middle
 #Welcome/Intro/Overview/Background
 
 ---
+class: inverse, center, middle
+
+# Hello!
+
+
+Isabella Velásquez
+
+Twitter: @ivelasq3
+
+Website: ivelasq.rbind.io
 
 ---
 class: inverse, center, middle
@@ -38,6 +48,7 @@ class: inverse, center, middle
 &lt;img src="https://media1.tenor.com/images/4abc0a93a957de4c1db543ec3f4834a7/tenor.gif?itemid=13633421" height="500" style="display: block; margin: auto;" /&gt;
 
 ---
+
 # R version 4.0.0 is out! 🌲
 
 ## What’s new?
@@ -54,11 +65,13 @@ class: inverse, center, middle
 and, `stringsAsFactors = FALSE`
 ---
 
-# How do you feel about upgrading R?
+# Chat
 
+How do you feel about upgrading R?
 Self-identify and share something you may be worried about in the chat:
 
-* 😎 Not worried 
+* 😎 Already upgraded
+* 😀 Not worried 
 * 🙂 Not too worried 
 * 😕 A little worried
 * 😨 Very worried
@@ -68,19 +81,28 @@ Self-identify and share something you may be worried about in the chat:
 # What does it mean to upgrade a major version of R?
 
 &lt;img src="https://giffiles.alphacoders.com/168/168275.gif" height="250" style="display: block; margin: auto;" /&gt;
---
 
 * For some - apprehension!
 * For others - opportunity!
 
 ---
+# What's wrong with reinstalling packages?
+
+--
+
+😨 😨 😨
+
+&lt;img src="img/not_found.png" height="250" style="display: block; margin: auto;" /&gt;
+
+---
 
 # Upgrade R // Install As You Go
 
-You can "start fresh" with no packages installed when you upgrade R.
+You can "start fresh" with no packages installed when you upgrade R. 
 
-* As you write scripts that need packages, then you can install them as you go.
-* Another option is to use {pacman}, that installs packages that are not already installed but mentioned in code.
+&lt;img src="https://i.kym-cdn.com/entries/icons/original/000/006/077/so_good.png" height="250" style="display: block; margin: auto;" /&gt;
+
+* Another option is to use {pacman} that installs packages that are not already installed but mentioned in code.
 * For previously written scripts, RStudio provides a helpful message if it detects a package that is not installed.
 
 ![](img/brms.png)&lt;!-- --&gt;
@@ -88,15 +110,93 @@ You can "start fresh" with no packages installed when you upgrade R.
 ---
 # Upgrade R // Reinstall All Packages
 
-You may want to be able to start working with R as soon as you update.
 
-## Reinstall After Updating
+```r
+# setup
+if (!require(tidyverse)) install.packages("tidyverse")
+if (!require(fs)) install.packages("fs")
+library(tidyverse)
+library(fs)
+```
 
-&lt;blockquote class="twitter-tweet"&gt;&lt;p lang="en" dir="ltr"&gt;Dread of reinstalling all your &lt;a href="https://twitter.com/hashtag/rstats?src=hash&amp;amp;ref_src=twsrc%5Etfw"&gt;#rstats&lt;/a&gt; packages keeping you from updating to R 4.0.0?💀Don&amp;#39;t despair! This script will reinstall them after you update! Code here: &lt;a href="https://t.co/5YnqmgqyUG"&gt;https://t.co/5YnqmgqyUG&lt;/a&gt; &lt;a href="https://t.co/VSivonPyWJ"&gt;pic.twitter.com/VSivonPyWJ&lt;/a&gt;&lt;/p&gt;&amp;mdash; Isabella Velásquez (@ivelasq3) &lt;a href="https://twitter.com/ivelasq3/status/1253766376331902979?ref_src=twsrc%5Etfw"&gt;April 24, 2020&lt;/a&gt;&lt;/blockquote&gt; &lt;script async src="https://platform.twitter.com/widgets.js" charset="utf-8"&gt;&lt;/script&gt;
+--
+
+
+```r
+# get all installed R versions
+if (Sys.info()[["sysname"]] == "Darwin") { 
+  r_dir &lt;- tibble::tibble(path = fs::dir_ls(fs::path_dir(fs::path_dir(fs::path_dir(.libPaths()[[1]])))))
+}
+if (Sys.info()[["sysname"]] %in% c("Linux", "Windows")) {
+  r_dir &lt;- tibble::tibble(path = fs::dir_ls(fs::path_dir(.libPaths()[[1]])))
+}
+```
+
+---
+
+
+```r
+# cue music
+r_dir &lt;- r_dir %&gt;%
+  # drop current R version
+  dplyr::filter(!(stringr::str_detect(path, "Current"))) %&gt;%
+  # extract the current and penultimate R versions as strings
+  dplyr::rowwise() %&gt;%
+  dplyr::mutate(version = as.numeric(stringr::str_extract(path, "[0-9]\\.[0-9]"))) %&gt;%
+  dplyr::ungroup() %&gt;%
+  dplyr::mutate(new_r = dplyr::nth(version, -1L), old_r = dplyr::nth(version, -2L)) %&gt;%
+  dplyr::mutate_at(vars("new_r", "old_r"), ~as.character(formatC(.x, digits = 1L, format = "f"))) %&gt;%
+  dplyr::filter(version == old_r)
+```
+
+--
+
+
+```r
+# get new and old R library paths
+new_libpath &lt;- .libPaths()
+old_libpath &lt;- stringr::str_replace(new_libpath, r_dir$new_r, r_dir$old_r)
+# get list of old installed R packages
+pkg_list &lt;- as.list(list.files(old_libpath))
+```
+
+---
+
+
+```r
+# get new and old R library paths
+new_libpath &lt;- .libPaths()
+old_libpath &lt;- stringr::str_replace(new_libpath, r_dir$new_r, r_dir$old_r)
+# get list of old installed R packages
+pkg_list &lt;- as.list(list.files(old_libpath))
+```
+
+--
+
+
+```r
+# define install_all() function
+install_all &lt;- function(x) {
+  print(x)
+  install.packages(x, quiet = TRUE)
+}
+```
+
+--
+
+
+```r
+# install all R packages in pkg_list
+purrr::quietly(purrr::walk(pkg_list, install_all))
+```
+
+---
+# Upgrade R // Reinstall All Packages
 
 ## Other Options
 
-* https://mobile.twitter.com/dailyzad/status/1253506170372980737
+&lt;img src="img/script.png" height="250" style="display: block; margin: auto;" /&gt;
+
 * Formal packages: {installr}, {yamlpack}...
 
 ---
@@ -104,21 +204,23 @@ You may want to be able to start working with R as soon as you update.
 
 If you want to keep the previous versions of your package but upgrade R, you can bring over the old versions.
 
+![](img/donot.png)&lt;!-- --&gt;
+
 ![](img/stringasfactors.jpg)&lt;!-- --&gt;
+
+.footnote[
+Warning image from https://rstats.wtf/maintaining-r.html
+]
 
 ---
 # Think of your Dependencies
 
-![](https://im2.ezgif.com/tmp/ezgif-2-728a809f4f41.gif)&lt;!-- --&gt;
-
-Source: https://twitter.com/andrewheiss/status/1021944992351186944?s=21
+&lt;blockquote class="twitter-tweet"&gt;&lt;p lang="und" dir="ltr"&gt; &lt;a href="https://t.co/xtfH4w3SiP"&gt;pic.twitter.com/xtfH4w3SiP&lt;/a&gt;&lt;/p&gt;&amp;mdash; Andrew Heiss (@andrewheiss) &lt;a href="https://twitter.com/andrewheiss/status/1021944992351186944?ref_src=twsrc%5Etfw"&gt;July 25, 2018&lt;/a&gt;&lt;/blockquote&gt; &lt;script async src="https://platform.twitter.com/widgets.js" charset="utf-8"&gt;&lt;/script&gt;
 
 ---
 # Do Not Upgrade R
 
 &lt;blockquote class="twitter-tweet"&gt;&lt;p lang="en" dir="ltr"&gt;Yeah, I&amp;#39;m just gonna act like &lt;a href="https://twitter.com/hashtag/rstats?src=hash&amp;amp;ref_src=twsrc%5Etfw"&gt;#rstats&lt;/a&gt; 4.0 doesn&amp;#39;t exist until I finish these papers. &lt;br&gt;MRAN January snapshot continues! &lt;a href="https://t.co/RrFCR86kcV"&gt;pic.twitter.com/RrFCR86kcV&lt;/a&gt;&lt;/p&gt;&amp;mdash; Chase Clark (@ChasingMicrobes) &lt;a href="https://twitter.com/ChasingMicrobes/status/1253036167941021696?ref_src=twsrc%5Etfw"&gt;April 22, 2020&lt;/a&gt;&lt;/blockquote&gt; &lt;script async src="https://platform.twitter.com/widgets.js" charset="utf-8"&gt;&lt;/script&gt;
-
-&lt;img src="https://media.giphy.com/media/IdmfEtnMWPzOg/200.gif" height="250" style="display: block; margin: auto;" /&gt;
 
 ---
 # Do Not Upgrade R
@@ -131,16 +233,20 @@ Even if you’d rather wait for R v4.1.0, there are a few things you can do:
 &lt;img src="https://media0.giphy.com/media/xUA7aUNw61j9Vdzs0U/giphy.gif" height="250" style="display: block; margin: auto;" /&gt;
 
 ---
-. Considerations
+# Considerations
 
 * How do you code?
 * How feasily can you refind your non-CRAN packages?
-* How ragile in your code?
-* WDo you want a 'fresh start'?
+* How fragile in your code?
+* Do you want a 'fresh start'?
 * Will your packages work with R 4.0.0?
-* hat do your dependencies look like?
+* What do your dependencies look like?
 * How fast is your internet?
 * How quick is your deadline?
+
+--
+
+&lt;img src="img/error.png" height="200" style="display: block; margin: auto;" /&gt;
 
 ---
 
@@ -425,7 +531,7 @@ theoffice %&gt;%
 ## Make a quick ggplot...
 
 .pull-left[
-![](useR-slides_files/figure-html/unnamed-chunk-15-1.png)&lt;!-- --&gt;
+![](useR-slides_files/figure-html/unnamed-chunk-25-1.png)&lt;!-- --&gt;
 ]
 
 .pull-right[
@@ -593,20 +699,16 @@ Compatible with
 
 - `renv` has lots of options and flexibility but retains simplicity 
 
---
+---
 class: inverse, center, middle
 
-# Cuestions?
+# Questions?
+
+## Isabella Velásquez, @ivelasq3
 
 ---
 # References
 
-## What's New
-
-* [Four New Useful Features in R 4.0.0](https://www.r-bloggers.com/4-for-4-0-0-four-useful-new-features-in-r-4-0-0/)
-* [R 4.0.0 Now Available](https://www.r-bloggers.com/r-4-0-0-now-available-and-a-look-back-at-rs-history/
-)
-*
 ## More on `renv`
 
  [renv website](rstudio.github.io.renv)
